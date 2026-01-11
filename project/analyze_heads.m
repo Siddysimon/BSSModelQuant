@@ -2,13 +2,14 @@
 
 tissues = {'wm','gm','csf','bone','skin','eyes','air'};
 
-% subjects = append('TIME',{'020','041','045','052','057','072','081','082','085'});
-subjects = append('TIME',{'081','082','085'});
+% subjects = append('TIME',{'020','041','045','052', '057','072','081','082','085'});
+subjects = append('TIME',{'045','052', '057','072','081','082','085'});
 just_masks = 1;
-TIME=0;
+TIME=1;
+is_DE_run=1;
 
 if(~TIME)
-    directory = '/Volumes/spiral/BSSLab/TMSTestRetest/Models/';
+    directory = '/Volumes/spiral/BSSLab/TMSTestRetest/Models/'; 
 
     % List contents of the directory
     contents = dir(directory);
@@ -76,7 +77,11 @@ for i =1:length(subjects)
         end
 
         run1 = join([subject_dir '/' lowest_folder '/m2m_' subjects{i} '/mask_prep/']);
-        run2 = join([subject_dir '/' highest_folder '/m2m_' subjects{i} '/mask_prep/']);
+        if is_DE_run
+            run2 = append(subjects{i}, '_VoxCount/', 'dilated/');
+        else
+            run2 = join([subject_dir '/' highest_folder '/m2m_' subjects{i} '/mask_prep/']);
+        end
         geoPost = join([subject_dir '/' highest_folder '/m2m_' subjects{i} '/' subjects{i} '.geo']);
         
 
@@ -104,8 +109,12 @@ for i =1:length(subjects)
     else
         
         run1 = ['/Volumes/spiral/BSSLab/TIME/Modeling/' subjects{i} '/Model/headreco_T1/run1/m2m_' subjects{i} '/mask_prep/'];
-        run2 = ['/Volumes/spiral/BSSLab/TIME/Modeling/' subjects{i} '/Model/headreco_T1/m2m_' subjects{i} '/mask_prep/'];
-        geoPost = join(['/Volumes/spiral/BSSLab/MEQ/' subjects{i} '/' subjects{i} '_run2/' subjects{i} '_run2_model.mat']);
+        if is_DE_run
+            run2 = append(subjects{i}, '_VoxCount/', 'dilated/');
+        else
+            run2 = ['/Volumes/spiral/BSSLab/TIME/Modeling/' subjects{i} '/Model/headreco_T1/m2m_' subjects{i} '/mask_prep/'];
+        end
+            geoPost = join(['/Volumes/spiral/BSSLab/MEQ/' subjects{i} '/' subjects{i} '_run2/' subjects{i} '_run2_model.mat']);
 
     end
         electrodes = [];
@@ -170,13 +179,18 @@ for i =1:length(subjects)
         set(gca,'FontSize',14)
 
         voxcount_dir = join([subjects{i} '_VoxCount']);
-        if exist(voxcount_dir, 'dir')
-            rmdir(voxcount_dir, 's');
+        if ~exist(voxcount_dir, 'dir')
+            mkdir(voxcount_dir);
         end
-        mkdir(voxcount_dir);
+        
+        if is_DE_run
+            saveas(gcf,append(voxcount_dir, '/Dilate_Axial_View'))
+            saveas(gcf,append(voxcount_dir, '/Dilate_Axial_View', '.png'))
+        else
+            saveas(gcf,append(voxcount_dir, '/Axial_View'))
+            saveas(gcf,append(voxcount_dir, '/Axial_View', '.png'))
+        end
 
-        saveas(gcf,append(voxcount_dir, '/Axial_View'))
-        saveas(gcf,append(voxcount_dir, '/Axial_View', '.png'))
         close all
 
          % By tissue index
@@ -207,12 +221,20 @@ for i =1:length(subjects)
         c=colorbar;
         title(['Change in masks, min=' num2str(min(sumD(:))) ', max=' num2str(max(sumD(:)))])
         set(gca,'FontSize',14)
-
-        saveas(gcf,append(voxcount_dir, '/Coronal_View'))
-        saveas(gcf,append(voxcount_dir, '/Coronal_View', '.png'))
+        if is_DE_run
+            saveas(gcf,append(voxcount_dir, '/Dilate_Coronal_View'))
+            saveas(gcf,append(voxcount_dir, '/Dilate_Coronal_View', '.png'))
+        else
+            saveas(gcf,append(voxcount_dir, '/Coronal_View'))
+            saveas(gcf,append(voxcount_dir, '/Coronal_View', '.png'))
+        end
         close all
+        if is_DE_run
+            save(join([voxcount_dir '/Dilate_Segmentation.mat']), 'Segmentation', '-v7.3');
+        else
+            save(join([voxcount_dir '/Segmentation.mat']), 'Segmentation', '-v7.3');
+        end
 
-        save(join([voxcount_dir '/Segmentation.mat']), 'Segmentation', '-v7.3');
     end
 
 end

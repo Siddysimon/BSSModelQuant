@@ -1,0 +1,50 @@
+# Autosave files
+*.asv
+*.m~
+*.autosave
+*.slx.r*
+*.mdl.r*
+
+# Derived content-obscured files
+*.p
+
+# Compiled MEX files
+*.mex*
+
+# Packaged app and toolbox files
+*.mlappinstall
+*.mltbx
+
+# Deployable archives
+*.ctf
+
+# Generated helpsearch folders
+helpsearch*/
+
+# Code generation folders
+slprj/
+sccprj/
+codegen/
+
+# Cache files
+*.slxc
+
+# Cloud based storage dotfile
+.MATLABDriveTag
+
+# macOS metadata
+.DS_Store
+
+# Generated analysis outputs and data drops
+*_VoxCount/
+VoxCountAgg/
+BB_TIME*/
+Visualize_TIME*/
+Combined_*/
+OldRunsWithCylinderField/
+local_data_backup/
+resources/project/start*.mat
+
+# Data folders (subject runs)
+[0-9]*BI_*/
+TIME*/

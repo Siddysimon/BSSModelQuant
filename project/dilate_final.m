@@ -43,32 +43,50 @@ for i = 1:numel(subjectsBI)
         highest_folder = sprintf('run%d', highest_number);
 
         runF = join([subject_dir '/' highest_folder '/m2m_' subjectsBI{i} '/mask_prep/']);
+        
 
         % Check if the Segmentation.mat file exists in the folder
         if exist(runF, 'dir')
-            dilatedDir = append(runF, 'dilated/');
-            erodedDir = append(runF, 'eroded/');
+            dilatedDir = append(subjectsBI{i}, '_VoxCount/', 'dilated/');
+            erodedDir = append(subjectsBI{i}, '_VoxCount/',  'eroded/');
+
+            % oldDilated = append(runF, 'dilated/');
+            % oldEroded = append(runF, 'eroded/');
+            % if exist(oldDilated, 'dir')
+            %     rmdir(oldDilated, 's')
+            % end
+            % if exist(oldEroded, 'dir')
+            %     rmdir(oldEroded, 's')
+            % end
+
             if ~exist(dilatedDir, 'dir')
                 mkdir(dilatedDir)
+            else
+                delete(append(dilatedDir,'*'))
             end
+
             if ~exist(erodedDir, 'dir')
                 mkdir(erodedDir)
+            else
+                delete(append(erodedDir,'*'))
             end
+
             for j = 1:numel(tissues)
-                if exist(append(dilatedDir, 'dilated_', tissueNifti.name), 'file') && exist(append(erodedDir, 'eroded_', tissueNifti.name), 'file')
-                    continue
-                end
                 tissueNifti = dir(fullfile(runF,append('*', upper((tissues{j})), '*.nii*')));
                 if length(tissueNifti) > 1
                     tissueNifti = tissueNifti(1);
                 end
+                if exist(append(dilatedDir, tissueNifti.name), 'file') && exist(append(erodedDir, tissueNifti.name), 'file')
+                    continue
+                end
+
                 mask = nifti_load(append(runF, tissueNifti.name));
                 maskDilate = mask;
                 maskErode = mask;
                 maskDilate.vol = thickenbinvol(mask.vol, 2);
                 maskErode.vol = thinbinvol(mask.vol, 2);
-                nifti_save(maskDilate, append(dilatedDir, 'dilated_', tissueNifti.name));
-                nifti_save(maskErode, append(erodedDir, 'eroded_', tissueNifti.name));
+                nifti_save(maskDilate, append(dilatedDir, tissueNifti.name));
+                nifti_save(maskErode, append(erodedDir, tissueNifti.name));
                 
             end
 
@@ -86,30 +104,49 @@ for i = 1:numel(subjectsTIME)
 
     % Check if the final run folder exists
     if exist(runF, 'dir')
-            dilatedDir = append(runF, 'dilated/');
-            erodedDir = append(runF, 'eroded/');
+            dilatedDir = append(subjectsTIME{i}, '_VoxCount/',  'dilated/');
+            erodedDir = append(subjectsTIME{i}, '_VoxCount/',  'eroded/');
+
+            % oldDilated = append(runF, 'dilated/');
+            % oldEroded = append(runF, 'eroded/');
+            % if exist(oldDilated, 'dir')
+            %     rmdir(oldDilated, 's')
+            % end
+            % if exist(oldEroded, 'dir')
+            %     rmdir(oldEroded, 's')
+            % end
+
             if ~exist(dilatedDir, 'dir')
                 mkdir(dilatedDir)
+            else
+                delete(append(dilatedDir,'*'))
             end
+
             if ~exist(erodedDir, 'dir')
                 mkdir(erodedDir)
+            else
+                delete(append(erodedDir,'*'))
             end
-            for j = 1:numel(tissues)
-                if exist(append(dilatedDir, 'dilated_', tissueNifti.name), 'file') && exist(append(erodedDir, 'eroded_', tissueNifti.name), 'file')
-                    continue
-                end
 
+            for j = 1:numel(tissues)
                 tissueNifti = dir(fullfile(runF,append('*', upper((tissues{j})), '*.nii*')));
                 if length(tissueNifti) > 1
                     tissueNifti = tissueNifti(1)
                 end
+
+
+                if exist(append(dilatedDir, tissueNifti.name), 'file') && exist(append(erodedDir, tissueNifti.name), 'file')
+                    continue
+                end
+
+     
                 mask = nifti_load(append(runF, tissueNifti.name));
                 maskDilate = mask;
                 maskErode = mask;
                 maskDilate.vol = thickenbinvol(mask.vol, 2);
                 maskErode.vol = thinbinvol(mask.vol, 2);
-                nifti_save(maskDilate, append(dilatedDir, 'dilated_', tissueNifti.name));
-                nifti_save(maskErode, append(erodedDir, 'eroded_', tissueNifti.name));
+                nifti_save(maskDilate, append(dilatedDir, tissueNifti.name));
+                nifti_save(maskErode, append(erodedDir, tissueNifti.name));
             end
 
     else
